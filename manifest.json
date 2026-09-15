@@ -1,0 +1,18 @@
+{
+  "name": "onokasirlocal-tools",
+  "version": "1.0.0",
+  "platform": "windows",
+  "files": [
+    "configure-apache.bat",
+    "configure-hosts.bat",
+    "control-center.bat",
+    "control-center.ps1",
+    "health-check.bat",
+    "install-services.bat",
+    "install-services.ps1",
+    "repair-ono-sql.ps1",
+    "run-all.bat",
+    "status.bat",
+    "stop-all.bat"
+  ]
+}
