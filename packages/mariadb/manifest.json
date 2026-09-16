@@ -4,6 +4,18 @@
   "platform": "windows",
   "component": "mariadb",
   "installDirectory": "mariadb",
-  "config": ["mariadb/my.ini"],
-  "port": 3306
+  "executable": "mariadb/bin/mariadbd.exe",
+  "files": [
+    "mariadb/bin/mariadbd.exe",
+    "mariadb/bin/mysql.exe"
+  ],
+  "config": [
+    "mariadb/my.ini"
+  ],
+  "port": 3306,
+  "release": {
+    "tag": "runtime-v1.0.0",
+    "asset": "onokasirlocal-mariadb-1.0.0.zip",
+    "checksumAsset": "onokasirlocal-mariadb-1.0.0.zip.sha256"
+  }
 }
