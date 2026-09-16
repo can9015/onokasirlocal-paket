@@ -14,7 +14,7 @@
   ],
   "port": 3306,
   "release": {
-    "tag": "onolocal-v1.0.0",
+    "tag": "Onolocal-v1.0.0",
     "asset": "onokasirlocal-mariadb-1.0.0.zip",
     "checksumAsset": "onokasirlocal-mariadb-1.0.0.zip.sha256"
   }
