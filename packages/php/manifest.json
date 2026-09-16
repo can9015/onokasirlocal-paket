@@ -6,5 +6,16 @@
   "installDirectory": "php",
   "executable": "php/php.exe",
   "cgi": "php/php-cgi.exe",
-  "config": ["php/php.ini"]
+  "files": [
+    "php/php.exe",
+    "php/php-cgi.exe"
+  ],
+  "config": [
+    "php/php.ini"
+  ],
+  "release": {
+    "tag": "runtime-v1.0.0",
+    "asset": "onokasirlocal-php-1.0.0.zip",
+    "checksumAsset": "onokasirlocal-php-1.0.0.zip.sha256"
+  }
 }
