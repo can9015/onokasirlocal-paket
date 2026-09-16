@@ -1,0 +1,10 @@
+{
+  "name": "onokasirlocal-php",
+  "version": "1.0.0",
+  "platform": "windows",
+  "component": "php",
+  "installDirectory": "php",
+  "executable": "php/php.exe",
+  "cgi": "php/php-cgi.exe",
+  "config": ["php/php.ini"]
+}

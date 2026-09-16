@@ -1,0 +1,9 @@
+{
+  "name": "onokasirlocal-mariadb",
+  "version": "1.0.0",
+  "platform": "windows",
+  "component": "mariadb",
+  "installDirectory": "mariadb",
+  "config": ["mariadb/my.ini"],
+  "port": 3306
+}

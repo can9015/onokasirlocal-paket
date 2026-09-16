@@ -1,0 +1,9 @@
+{
+  "name": "onokasirlocal-apache",
+  "version": "1.0.0",
+  "platform": "windows",
+  "component": "apache",
+  "installDirectory": "apache",
+  "executable": "apache/bin/httpd.exe",
+  "config": ["apache/conf/httpd.conf", "apache/conf/vhosts/onokasir.local.conf"]
+}

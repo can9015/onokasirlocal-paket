@@ -1,0 +1,8 @@
+{
+  "name": "onokasirlocal-phpmyadmin",
+  "version": "1.0.0",
+  "platform": "windows",
+  "component": "phpmyadmin",
+  "installDirectory": "phpmyadmin",
+  "config": ["phpmyadmin/config.inc.php"]
+}
