@@ -13,7 +13,7 @@
     "apache/conf/vhosts/onokasir.local.conf"
   ],
   "release": {
-    "tag": "onolocal-v1.0.0",
+    "tag": "Onolocal-v1.0.0",
     "asset": "onokasirlocal-apache-1.0.0.zip",
     "checksumAsset": "onokasirlocal-apache-1.0.0.zip.sha256"
   }
