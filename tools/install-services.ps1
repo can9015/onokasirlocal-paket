@@ -1,92 +1,318 @@
 # ============================================================
-# OnoKasir Local - STEP 07
-# Install Apache + MySQL as Windows Services
+# OnoKasir Local
+# Install Apache + MariaDB as Windows Services
 # Run this script AS ADMINISTRATOR.
 # ============================================================
 
 $ErrorActionPreference = 'Stop'
 
 $Root = 'D:\OnokasirLocal'
+
+# ============================================================
+# PATH
+# ============================================================
+
 $ApacheExe = Join-Path $Root 'apache\bin\httpd.exe'
 $ApacheConf = Join-Path $Root 'apache\conf\httpd.conf'
-$MySqlExe = Join-Path $Root 'mysql\bin\mysqld.exe'
-$MyIni = Join-Path $Root 'mysql\my.ini'
+
+$MariaDbExe = Join-Path $Root 'mariadb\bin\mariadbd.exe'
+$MariaDbIni = Join-Path $Root 'mariadb\my.ini'
+
+# ============================================================
+# SERVICE
+# ============================================================
 
 $ApacheService = 'OnokasirApache'
-$MySqlService = 'OnokasirMySQL'
+$MariaDbService = 'OnokasirMariaDB'
+
+# Legacy service yang dulu dipakai.
+$LegacyMySqlService = 'OnokasirMySQL'
+
+# ============================================================
+# ADMIN
+# ============================================================
 
 function Assert-Admin {
+
     $id = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $p = New-Object Security.Principal.WindowsPrincipal($id)
-    if (-not $p.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        throw 'Jalankan PowerShell / script ini dengan Run as administrator.'
+
+    $principal = New-Object `
+        Security.Principal.WindowsPrincipal(
+            $id
+        )
+
+    if (
+        -not $principal.IsInRole(
+            [Security.Principal.WindowsBuiltInRole]::Administrator
+        )
+    ) {
+        throw 'Jalankan script ini dengan Run as administrator.'
     }
 }
 
-function Assert-File($Path, $Name) {
-    if (-not (Test-Path -LiteralPath $Path)) {
+# ============================================================
+# FILE CHECK
+# ============================================================
+
+function Assert-File {
+
+    param(
+        [string]$Path,
+        [string]$Name
+    )
+
+    if (
+        -not (
+            Test-Path `
+                -LiteralPath $Path `
+                -PathType Leaf
+        )
+    ) {
+
         throw "$Name tidak ditemukan: $Path"
     }
 }
 
+# ============================================================
+# START
+# ============================================================
+
 Assert-Admin
-Assert-File $ApacheExe 'Apache httpd.exe'
-Assert-File $ApacheConf 'Apache httpd.conf'
-Assert-File $MySqlExe 'MySQL mysqld.exe'
-Assert-File $MyIni 'MySQL my.ini'
+
+Assert-File `
+    $ApacheExe `
+    'Apache httpd.exe'
+
+Assert-File `
+    $ApacheConf `
+    'Apache httpd.conf'
+
+Assert-File `
+    $MariaDbExe `
+    'MariaDB mariadbd.exe'
+
+Assert-File `
+    $MariaDbIni `
+    'MariaDB my.ini'
 
 Write-Host ''
-Write-Host '=== OnoKasir Local - Install Services ===' -ForegroundColor Cyan
+Write-Host '============================================' `
+    -ForegroundColor Cyan
+
+Write-Host ' ONOKASIR LOCAL - INSTALL SERVICES' `
+    -ForegroundColor Cyan
+
+Write-Host '============================================' `
+    -ForegroundColor Cyan
+
 Write-Host ''
 
-# Validate Apache config before installation.
-& $ApacheExe -f $ApacheConf -t
+Write-Host "Root    : $Root"
+Write-Host "Apache  : $ApacheService"
+Write-Host "MariaDB : $MariaDbService"
+Write-Host ''
+
+# ============================================================
+# VALIDATE APACHE
+# ============================================================
+
+Write-Host 'Validating Apache configuration...' `
+    -ForegroundColor Yellow
+
+& $ApacheExe `
+    -f $ApacheConf `
+    -t
+
 if ($LASTEXITCODE -ne 0) {
-    throw 'Konfigurasi Apache tidak valid. Service tidak dipasang.'
+
+    throw `
+        'Konfigurasi Apache tidak valid. Service tidak dipasang.'
 }
 
-# Remove our old service definitions if present, but do NOT remove any unrelated services.
-foreach ($svc in @($ApacheService, $MySqlService)) {
-    $existing = Get-Service -Name $svc -ErrorAction SilentlyContinue
-    if ($null -ne $existing) {
-        if ($existing.Status -ne 'Stopped') {
-            Write-Host "Stopping $svc ..." -ForegroundColor Yellow
-            Stop-Service -Name $svc -Force -ErrorAction SilentlyContinue
-            Start-Sleep -Seconds 2
-        }
+Write-Host '[OK] Apache configuration valid.' `
+    -ForegroundColor Green
+
+Write-Host ''
+
+# ============================================================
+# REMOVE LEGACY MYSQL SERVICE
+# ============================================================
+
+$legacyService = Get-Service `
+    -Name $LegacyMySqlService `
+    -ErrorAction SilentlyContinue
+
+if ($null -ne $legacyService) {
+
+    Write-Host `
+        "Legacy service ditemukan: $LegacyMySqlService" `
+        -ForegroundColor Yellow
+
+    if (
+        $legacyService.Status -ne 'Stopped'
+    ) {
+
+        Write-Host `
+            "Stopping legacy service..." `
+            -ForegroundColor Yellow
+
+        Stop-Service `
+            -Name $LegacyMySqlService `
+            -Force `
+            -ErrorAction SilentlyContinue
+
+        Start-Sleep -Seconds 2
     }
+
+    Write-Host `
+        "Removing legacy service: $LegacyMySqlService" `
+        -ForegroundColor Yellow
+
+    & sc.exe delete $LegacyMySqlService
+
+    if ($LASTEXITCODE -ne 0) {
+
+        throw `
+            "Gagal menghapus service legacy $LegacyMySqlService."
+    }
+
+    Start-Sleep -Seconds 2
+
+    Write-Host `
+        "[OK] Legacy MySQL service dihapus." `
+        -ForegroundColor Green
 }
 
-# Apache service.
-$apacheExisting = Get-Service -Name $ApacheService -ErrorAction SilentlyContinue
-if ($null -eq $apacheExisting) {
-    Write-Host "Installing Apache service: $ApacheService" -ForegroundColor Green
-    & $ApacheExe -f $ApacheConf -k install -n $ApacheService
-    if ($LASTEXITCODE -ne 0) { throw 'Gagal memasang service Apache.' }
-} else {
-    Write-Host "Apache service sudah ada: $ApacheService" -ForegroundColor DarkGray
+# ============================================================
+# REMOVE OLD MARIADB SERVICE IF INVALID
+# ============================================================
+
+$existingMariaDb = Get-Service `
+    -Name $MariaDbService `
+    -ErrorAction SilentlyContinue
+
+if ($null -ne $existingMariaDb) {
+
+    Write-Host `
+        "MariaDB service sudah ada: $MariaDbService" `
+        -ForegroundColor DarkGray
+}
+else {
+
+    # ========================================================
+    # INSTALL MARIADB SERVICE
+    # ========================================================
+
+    Write-Host `
+        "Installing MariaDB service: $MariaDbService" `
+        -ForegroundColor Green
+
+    & $MariaDbExe `
+        --install `
+        $MariaDbService `
+        --defaults-file="$MariaDbIni"
+
+    if ($LASTEXITCODE -ne 0) {
+
+        throw `
+            'Gagal memasang service MariaDB.'
+    }
+
+    Write-Host `
+        '[OK] MariaDB service berhasil dipasang.' `
+        -ForegroundColor Green
 }
 
-# MySQL service. --defaults-file must be specified as part of the ImagePath.
-$mysqlExisting = Get-Service -Name $MySqlService -ErrorAction SilentlyContinue
-if ($null -eq $mysqlExisting) {
-    Write-Host "Installing MySQL service: $MySqlService" -ForegroundColor Green
-    & $MySqlExe --install $MySqlService --defaults-file=$MyIni
-    if ($LASTEXITCODE -ne 0) { throw 'Gagal memasang service MySQL.' }
-} else {
-    Write-Host "MySQL service sudah ada: $MySqlService" -ForegroundColor DarkGray
+# ============================================================
+# APACHE SERVICE
+# ============================================================
+
+$existingApache = Get-Service `
+    -Name $ApacheService `
+    -ErrorAction SilentlyContinue
+
+if ($null -ne $existingApache) {
+
+    Write-Host `
+        "Apache service sudah ada: $ApacheService" `
+        -ForegroundColor DarkGray
+}
+else {
+
+    Write-Host `
+        "Installing Apache service: $ApacheService" `
+        -ForegroundColor Green
+
+    & $ApacheExe `
+        -f $ApacheConf `
+        -k install `
+        -n $ApacheService
+
+    if ($LASTEXITCODE -ne 0) {
+
+        throw `
+            'Gagal memasang service Apache.'
+    }
+
+    Write-Host `
+        '[OK] Apache service berhasil dipasang.' `
+        -ForegroundColor Green
 }
 
-# Automatic startup: this is the requested AUTO RUN behavior.
-Set-Service -Name $ApacheService -StartupType Automatic
-Set-Service -Name $MySqlService -StartupType Automatic
+# ============================================================
+# AUTOMATIC START
+# ============================================================
 
-# Display installed services.
-Write-Host ''
-Get-Service -Name $MySqlService, $ApacheService | Select-Object Name, Status, StartType | Format-Table -AutoSize
+Set-Service `
+    -Name $ApacheService `
+    -StartupType Automatic
+
+Set-Service `
+    -Name $MariaDbService `
+    -StartupType Automatic
+
+# ============================================================
+# FINAL STATUS
+# ============================================================
 
 Write-Host ''
-Write-Host 'SERVICE INSTALL SELESAI.' -ForegroundColor Green
-Write-Host 'AUTO RUN Windows: ON (Automatic).' -ForegroundColor Green
+
+Write-Host '============================================' `
+    -ForegroundColor Cyan
+
+Write-Host ' SERVICE STATUS' `
+    -ForegroundColor Cyan
+
+Write-Host '============================================' `
+    -ForegroundColor Cyan
+
 Write-Host ''
-Write-Host 'Berikutnya jalankan: tools\control-center.bat' -ForegroundColor Cyan
+
+Get-Service `
+    -Name $MariaDbService, $ApacheService `
+    | Select-Object Name, Status, StartType `
+    | Format-Table -AutoSize
+
+Write-Host ''
+
+Write-Host 'SERVICE INSTALL SELESAI.' `
+    -ForegroundColor Green
+
+Write-Host 'Apache  : OnokasirApache' `
+    -ForegroundColor Green
+
+Write-Host 'MariaDB : OnokasirMariaDB' `
+    -ForegroundColor Green
+
+Write-Host 'AUTO RUN Windows : ON' `
+    -ForegroundColor Green
+
+Write-Host ''
+
+Write-Host 'Berikutnya:' `
+    -ForegroundColor Cyan
+
+Write-Host 'tools\control-center.bat' `
+    -ForegroundColor Cyan
+
+Write-Host ''
