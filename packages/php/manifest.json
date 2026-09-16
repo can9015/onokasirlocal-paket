@@ -14,7 +14,7 @@
     "php/php.ini"
   ],
   "release": {
-    "tag": "onolocal-v1.0.0",
+    "tag": "Onolocal-v1.0.0",
     "asset": "onokasirlocal-php-1.0.0.zip",
     "checksumAsset": "onokasirlocal-php-1.0.0.zip.sha256"
   }
