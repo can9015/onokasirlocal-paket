@@ -5,5 +5,16 @@
   "component": "apache",
   "installDirectory": "apache",
   "executable": "apache/bin/httpd.exe",
-  "config": ["apache/conf/httpd.conf", "apache/conf/vhosts/onokasir.local.conf"]
+  "files": [
+    "apache/bin/httpd.exe"
+  ],
+  "config": [
+    "apache/conf/httpd.conf",
+    "apache/conf/vhosts/onokasir.local.conf"
+  ],
+  "release": {
+    "tag": "runtime-v1.0.0",
+    "asset": "onokasirlocal-apache-1.0.0.zip",
+    "checksumAsset": "onokasirlocal-apache-1.0.0.zip.sha256"
+  }
 }
