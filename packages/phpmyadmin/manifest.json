@@ -4,5 +4,16 @@
   "platform": "windows",
   "component": "phpmyadmin",
   "installDirectory": "phpmyadmin",
-  "config": ["phpmyadmin/config.inc.php"]
+  "executable": "phpmyadmin/index.php",
+  "files": [
+    "phpmyadmin/index.php"
+  ],
+  "config": [
+    "phpmyadmin/config.inc.php"
+  ],
+  "release": {
+    "tag": "runtime-v1.0.0",
+    "asset": "onokasirlocal-phpmyadmin-1.0.0.zip",
+    "checksumAsset": "onokasirlocal-phpmyadmin-1.0.0.zip.sha256"
+  }
 }
