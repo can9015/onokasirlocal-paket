@@ -16,3 +16,52 @@
     "stop-all.bat"
   ]
 }
+
+{
+  "name": "onokasirlocal-apache",
+  "version": "1.0.0",
+  "platform": "windows",
+  "component": "apache",
+  "installDirectory": "apache",
+  "executable": "apache/bin/httpd.exe",
+  "config": [
+    "apache/conf/httpd.conf",
+    "apache/conf/vhosts/onokasir.local.conf"
+  ]
+}
+
+{
+  "name": "onokasirlocal-php",
+  "version": "1.0.0",
+  "platform": "windows",
+  "component": "php",
+  "installDirectory": "php",
+  "executable": "php/php.exe",
+  "cgi": "php/php-cgi.exe",
+  "config": [
+    "php/php.ini"
+  ]
+}
+
+{
+  "name": "onokasirlocal-mariadb",
+  "version": "1.0.0",
+  "platform": "windows",
+  "component": "mariadb",
+  "installDirectory": "mariadb",
+  "config": [
+    "mariadb/my.ini"
+  ],
+  "port": 3306
+}
+
+{
+  "name": "onokasirlocal-phpmyadmin",
+  "version": "1.0.0",
+  "platform": "windows",
+  "component": "phpmyadmin",
+  "installDirectory": "phpmyadmin",
+  "config": [
+    "phpmyadmin/config.inc.php"
+  ]
+}
