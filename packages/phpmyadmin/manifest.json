@@ -12,7 +12,7 @@
     "phpmyadmin/config.inc.php"
   ],
   "release": {
-    "tag": "onolocal-v1.0.0",
+    "tag": "Onolocal-v1.0.0",
     "asset": "onokasirlocal-phpmyadmin-1.0.0.zip",
     "checksumAsset": "onokasirlocal-phpmyadmin-1.0.0.zip.sha256"
   }
